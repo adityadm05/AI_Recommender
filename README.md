@@ -1,217 +1,121 @@
 # ✦ AI Product Recommender
 
-An AI-powered product recommendation system built with React, Vite, Tailwind CSS, and the Gemini API.
+![App screenshot](public/screenshot.png)
+
+A lightweight, attractive demo that uses a small static product dataset and the Gemini generative model to return concise, explainable product matches based on natural-language prompts.
 
 ---
 
-## Tech Stack
+**Highlights**
 
-- **React 18** + **Vite** — fast dev server, instant HMR
-- **Tailwind CSS v3** — utility-first styling with dark mode + glassmorphism
-- **Gemini API** (`gemini-1.5`) — natural language recommendations
-- **No backend** — all API calls made directly from the browser
-
----
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── ProductCard.jsx          # Displays a single product
-│   ├── RecommendationForm.jsx   # User preference input
-│   └── RecommendationResults.jsx # Shows AI output, loading, errors
-├── data/
-│   └── products.js              # 5 predefined products
-├── services/
-│   └── gemini.js                # Gemini fetch wrapper
-├── App.jsx                      # Root layout
-├── main.jsx                     # React entry point
-└── index.css                    # Tailwind directives
-```
+- Modern React + Vite developer experience
+- Beautiful Tailwind UI with dark mode + glassmorphism
+- Natural-language recommendations from Google Gemini
+- No server required for the demo (see security notes below)
 
 ---
 
-## ① Install & Setup
+**Quick Links**
 
-### Step 1 — Scaffold the project
+- Live entry: [index.html](index.html)
+- Main app entry: [src/main.jsx](src/main.jsx#L1)
+- Recommendation service: [src/services/gemini.js](src/services/gemini.js#L1)
+- Form component: [src/components/RecommendationForm.jsx](src/components/RecommendationForm.jsx#L1)
+
+---
+
+## Quick Start
+
+Prerequisites: Node 18+ and npm (or pnpm/yarn).
+
+1. Install dependencies
 
 ```bash
-npm create vite@latest ai-recommender -- --template react
-cd ai-recommender
 npm install
 ```
 
-### Step 2 — Install Tailwind CSS
+2. Create a `.env` in the project root and add your Gemini key:
 
-```bash
-npm install -D tailwindcss@3 postcss autoprefixer
-npx tailwindcss init -p
+```env
+# Vite exposes variables starting with VITE_ to the browser
+VITE_GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
 ```
 
-### Step 3 — Copy source files
-
-Replace the contents of the generated project with the files in this repo:
-
-```bash
-# After cloning/copying source files:
-npm install   # install any remaining deps
-```
-
----
-
-## ② Environment Variables
-
-Vite exposes env variables prefixed with `VITE_` to the browser.
-
-Create a `.env` file in the project root and add your Gemini service key there.
-
-```bash
-GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
-```
-
-> This app uses a local dev proxy to forward requests securely to Gemini. If the key is missing or invalid, recommendations will fail with a clear error message.
->
-> **Where to get a key:** https://developers.generativeai.google/  
-> ⚠️ This exposes your key in the browser. Fine for assessments/demos — use a backend proxy in production.
-
----
-
-## ③ Run the App
+3. Start dev server
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser.
+Open the app at http://localhost:5173
 
----
-
-## ④ How It Works
-
-1. **Products** are defined statically in `src/data/products.js`
-2. User types a preference (e.g. *"I want a phone under $500"*)
-3. `getRecommendations()` in `services/gemini.js` sends **both** the full product list and the user preference to Gemini
-4. The AI recommends only products from the provided list
-5. Results are displayed with loading and error handling
-
----
-
-## ⑤ Git Workflow (Assessment Session)
-
-Run these commits in order during your session. Each maps to a feature milestone.
-
----
-
-### Commit 1 — Project scaffolding
+Other scripts (from `package.json`):
 
 ```bash
-git init
-git add .
-git commit -m "chore: init Vite + React project"
+npm run build   # create production build
+npm run preview # preview production build locally
+npm run lint    # run ESLint
 ```
-> Scaffold via `npm create vite`, install dependencies, confirm dev server runs.
 
 ---
 
-### Commit 2 — Tailwind CSS setup
+## What changed / Compatibility notes
 
-```bash
-git add tailwind.config.js postcss.config.js src/index.css index.html
-git commit -m "chore: add Tailwind CSS with dark mode config"
-```
-> Install Tailwind v3, configure `content` paths, add `@tailwind` directives, set `class="dark"` on `<html>`.
+- The app now requires the environment variable `VITE_GEMINI_API_KEY` (see `.env`).
+- `src/services/gemini.js` calls the Gemini `generateContent` endpoint directly and expects the `candidates[0].content.parts[0].text` response path.
+- The code uses the `gemini-2.5-flash` model surface by default in `gemini.js` (this is configured in the request URL inside the file).
 
----
-
-### Commit 3 — Product dataset
-
-```bash
-git add src/data/products.js
-git commit -m "feat: add product dataset with 5 items"
-```
-> Define 5 products (smartphones, headphones, tablet, laptop) with name, price, features, and rating.
+If you previously set `GEMINI_API_KEY` the app will not find it; rename it to `VITE_GEMINI_API_KEY` and restart the dev server.
 
 ---
 
-### Commit 4 — ProductCard component
+## How It Works (short)
 
-```bash
-git add src/components/ProductCard.jsx
-git commit -m "feat: build ProductCard with glassmorphism styling"
-```
-> Glassmorphism card displaying product icon, name, category, price, rating, and feature pills.
-
----
-
-### Commit 5 — RecommendationForm component
-
-```bash
-git add src/components/RecommendationForm.jsx
-git commit -m "feat: add RecommendationForm with example prompts"
-```
-> Text input + submit button + clickable example preference chips.
+1. The UI provides a small static product dataset (`src/data/products.js`).
+2. User enters a free-text preference in the `RecommendationForm` component.
+3. `getRecommendations(products, preference)` in `src/services/gemini.js` builds a single prompt containing the product list and the user preference and sends it to Gemini.
+4. Gemini returns a short, human-readable recommendation string which the app renders in `RecommendationResults` with loading and error states handled gracefully.
 
 ---
 
-### Commit 6 — Gemini API integration
+## Security & Production
 
-```bash
-git add src/services/gemini.js .env.example .gitignore
-git commit -m "feat: integrate Gemini API for product recommendations"
-```
-> Fetch wrapper that sends product list + user preference to Gemini, handles API errors and missing key.
+- This demo calls Gemini directly from the browser using `VITE_GEMINI_API_KEY`. That means the key is visible to end users and is only appropriate for local demos or controlled assessments.
+- For production, move requests to a backend proxy that stores the API key server-side and enforces rate limits and authentication.
 
----
-
-### Commit 7 — Wire up App.jsx
-
-```bash
-git add src/App.jsx src/main.jsx
-git commit -m "feat: connect components in App with state management"
-```
-> `useState` for result/loading/error, `handleRecommend` async function wiring form → API → results.
+Where to get a key: https://developers.generativeai.google/
 
 ---
 
-### Commit 8 — Loading and error states
+## Project Structure (short)
 
-```bash
-git add src/components/RecommendationResults.jsx
-git commit -m "feat: add RecommendationResults with loading spinner and error handling"
 ```
-> Animated spinner during API call, styled error card on failure, clean empty state with placeholder.
+src/
+├─ components/
+│  ├─ ProductCard.jsx
+│  ├─ RecommendationForm.jsx
+│  └─ RecommendationResults.jsx
+├─ data/
+│  └─ products.js
+├─ services/
+│  └─ gemini.js
+├─ App.jsx
+└─ main.jsx
+```
 
 ---
 
-### Commit 9 — UI polish
+## Contributing
 
-```bash
-git add src/App.jsx src/index.css
-git commit -m "style: add gradient background blobs and header polish"
-```
-> Fixed gradient background blobs, gradient hero text, badge pill, two-column responsive layout.
+- Open an issue or create a PR. Keep changes small and focused.
+- If adding new models or endpoints, update `README.md` and environment docs.
 
 ---
 
-### Commit 10 — Final cleanup
+If you'd like, I can also:
 
-```bash
-git add .
-git commit -m "chore: final cleanup and code comments"
-```
-> Remove console.logs, add JSDoc-style inline comments, verify all edge cases work, check responsiveness.
+- Add a small screenshot or GIF to the README
+- Create a `.env.example` file and update `.gitignore`
+- Add a short CI workflow to validate builds
 
----
-
-## Features
-
-- [x] 5 predefined products displayed in a grid
-- [x] Natural language preference input
-- [x] AI recommends only from the available product list
-- [x] Loading spinner with animated ring
-- [x] Error handling with descriptive messages
-- [x] Example prompts for quick testing
-- [x] Responsive layout (mobile + desktop)
-- [x] Dark mode + glassmorphism design
-- [x] No backend required
+Happy to make those next — want me to add a `.env.example` now?
