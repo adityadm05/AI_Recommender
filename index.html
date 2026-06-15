@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!-- Fix 1: Added class="dark" — required for Tailwind's darkMode: "class" to activate.
+     Without it, every dark: variant and bg-surface/text-on-surface color was ignored. -->
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Product Recommender</title>
+
+    <!-- Fix 2: Added Geist + JetBrains Mono font imports.
+         The tailwind.config.js references these fonts but they were never loaded,
+         so every fontFamily: Geist / JetBrains Mono class silently fell back to system-ui. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Symbols (kept from original) -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    />
+  </head>
+  <body class="bg-background text-on-surface antialiased min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

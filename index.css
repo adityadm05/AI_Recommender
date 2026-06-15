@@ -1,0 +1,52 @@
+/* Fixes applied:
+   1. Moved @tailwind directives to the very top (they were after a stale :root block)
+   2. Removed the entire old :root {} block — it was a light-theme blog palette
+      completely unrelated to this project, overriding nothing but adding confusion
+   3. Removed #root { width: 1126px; text-align: center; display: flex } —
+      these default Vite template styles were centre-aligning all text and
+      capping the layout width in a way that broke the two-column grid
+   4. Removed leftover h1/h2/p/code/body styles from the default Vite template
+   5. Kept only the custom @layer utilities that the app actually uses
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Geist", system-ui, sans-serif;
+    background-color: #131313;
+    color: #e5e2e1;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-surface/70 backdrop-blur-xl border border-white/10;
+  }
+  .glass-card {
+    @apply bg-surface-container/60 backdrop-blur-lg border border-white/5;
+  }
+  .glow-effect {
+    box-shadow: 0 0 40px rgba(192, 193, 255, 0.15);
+  }
+  .glow-text {
+    text-shadow: 0 0 20px rgba(192, 193, 255, 0.3);
+  }
+  .btn-gradient {
+    background: linear-gradient(135deg, theme('colors.primary'), theme('colors.secondary-container'));
+  }
+  .text-gradient {
+    background: linear-gradient(135deg, theme('colors.primary'), #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
